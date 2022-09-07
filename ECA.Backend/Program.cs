@@ -1,8 +1,10 @@
-using ECA.Backend.Common.Models.Context;
 using ECA.Backend.Common.Options;
+using ECA.Backend.Data.Context;
 using ECA.Backend.Logic.Interfaces;
 using ECA.Backend.Logic.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Npgsql;
 
 namespace ECA.Backend
 {
@@ -11,6 +13,24 @@ namespace ECA.Backend
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("host.settings.json", optional: true, reloadOnChange: false)
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: false)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                .AddEnvironmentVariables()
+                .Build();
+
+
+
+
+            var connectionString = new NpgsqlConnectionStringBuilder();
+            connectionString.Host = configuration["PostgreSql:Host"];
+            connectionString.Port = int.Parse(configuration["PostgreSql:Port"]);
+            connectionString.Database = configuration["PostgreSql:Database"];
+            connectionString.Username = configuration["PostgreSql:Username"];
+            connectionString.Password = configuration["PostgreSql:DbPassword"];
+            
 
             // Add services to the container.
 
@@ -29,7 +49,8 @@ namespace ECA.Backend
                     return passwordService;
                 })
                 .AddScoped<IUserService, UserService>()
-                .AddDbContext<UsersContext>(opt => opt.UseInMemoryDatabase("TodoList"));
+                .AddDbContextFactory<BackendContext>(opt => opt.UseNpgsql(connectionString.ConnectionString))
+                .AddDbContext<DbContext, BackendContext>(opt => opt.UseNpgsql(connectionString.ConnectionString));
 
 
 

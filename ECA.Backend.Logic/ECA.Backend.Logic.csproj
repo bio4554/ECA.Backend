@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ECA.Backend.Common\ECA.Backend.Common.csproj" />
+    <ProjectReference Include="..\ECA.Backend.Data\ECA.Backend.Data.csproj" />
   </ItemGroup>
 
 </Project>
