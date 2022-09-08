@@ -4,7 +4,7 @@
 
 namespace ECA.Backend.Data.Migrations
 {
-    public partial class AddUserData : Migration
+    public partial class UpdateModel : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

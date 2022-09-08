@@ -1,4 +1,5 @@
 ﻿using ECA.Backend.Common.Models;
+using ECA.Backend.Common.RequestResponse;
 using ECA.Backend.Data.Context;
 using ECA.Backend.Logic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -23,18 +24,18 @@ public class UsersController : ControllerBase
 
     // GET: api/Users
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<UserAccount>>> GetUsers()
     {
-        if (_context.Set<User>() == null) return NotFound();
-        return await _context.Set<User>().ToListAsync();
+        if (_context.Set<UserAccount>() == null) return NotFound();
+        return await _context.Set<UserAccount>().ToListAsync();
     }
 
     // GET: api/Users/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<User>> GetUser(long id)
+    public async Task<ActionResult<UserAccount>> GetUser(long id)
     {
-        if (_context.Set<User>() == null) return NotFound();
-        var user = await _context.Set<User>().FindAsync(id);
+        if (_context.Set<UserAccount>() == null) return NotFound();
+        var user = await _context.Set<UserAccount>().FindAsync(id);
 
         if (user == null) return NotFound();
 
@@ -44,11 +45,11 @@ public class UsersController : ControllerBase
     // PUT: api/Users/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutUser(Guid id, User user)
+    public async Task<IActionResult> PutUser(Guid id, UserAccount userAccount)
     {
-        if (id != user.Id) return BadRequest();
+        if (id != userAccount.Id) return BadRequest();
 
-        _context.Entry(user).State = EntityState.Modified;
+        _context.Entry(userAccount).State = EntityState.Modified;
 
         try
         {
@@ -67,11 +68,11 @@ public class UsersController : ControllerBase
     // POST: api/Users
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<User>> PostUser(User user)
+    public async Task<ActionResult<UserAccount>> PostUser(UserAccount userAccount)
     {
         try
         {
-            var response = await _userService.CreateUser(user);
+            var response = await _userService.CreateUser(userAccount);
             if (response == null)
             {
                 return BadRequest();
@@ -86,15 +87,35 @@ public class UsersController : ControllerBase
         }
     }
 
+    [HttpPost("login")]
+    public async Task<ActionResult<UserAccount>> PostLogin(LoginRequest req)
+    {
+        try
+        {
+            var res = await _userService.Login(req);
+            if (res.Authenticated)
+            {
+                return res.Account != null ? res.Account : Problem(statusCode: 500);
+            }
+            return BadRequest(res);
+        }
+        catch (Exception e)
+        {
+            _log.LogError(e.Message);
+            _log.LogError(e.StackTrace);
+            return Problem(statusCode: 500);
+        }
+    }
+
     // DELETE: api/Users/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(long id)
     {
-        if (_context.Set<User>() == null) return NotFound();
-        var user = await _context.Set<User>().FindAsync(id);
+        if (_context.Set<UserAccount>() == null) return NotFound();
+        var user = await _context.Set<UserAccount>().FindAsync(id);
         if (user == null) return NotFound();
 
-        _context.Set<User>().Remove(user);
+        _context.Set<UserAccount>().Remove(user);
         await _context.SaveChangesAsync();
 
         return NoContent();
@@ -102,6 +123,6 @@ public class UsersController : ControllerBase
 
     private bool UserExists(Guid id)
     {
-        return (_context.Set<User>()?.Any(e => e.Id == id)).GetValueOrDefault();
+        return (_context.Set<UserAccount>()?.Any(e => e.Id == id)).GetValueOrDefault();
     }
 }

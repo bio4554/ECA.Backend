@@ -22,7 +22,7 @@ namespace ECA.Backend.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ECA.Backend.Common.Models.User", b =>
+            modelBuilder.Entity("ECA.Backend.Common.Models.UserAccount", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -44,10 +44,10 @@ namespace ECA.Backend.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("UserAccount");
                 });
 
-            modelBuilder.Entity("ECA.Backend.Common.Models.UserData", b =>
+            modelBuilder.Entity("ECA.Backend.Common.Models.UserProfile", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -57,12 +57,31 @@ namespace ECA.Backend.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("UserAccountId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserData");
+                    b.HasIndex("UserAccountId")
+                        .IsUnique();
+
+                    b.ToTable("UserProfile");
+                });
+
+            modelBuilder.Entity("ECA.Backend.Common.Models.UserProfile", b =>
+                {
+                    b.HasOne("ECA.Backend.Common.Models.UserAccount", "UserAccount")
+                        .WithOne("Profile")
+                        .HasForeignKey("ECA.Backend.Common.Models.UserProfile", "UserAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserAccount");
+                });
+
+            modelBuilder.Entity("ECA.Backend.Common.Models.UserAccount", b =>
+                {
+                    b.Navigation("Profile");
                 });
 #pragma warning restore 612, 618
         }

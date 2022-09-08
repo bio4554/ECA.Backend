@@ -17,8 +17,8 @@ namespace ECA.Backend.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>();
-            modelBuilder.Entity<UserData>();
+            modelBuilder.Entity<UserAccount>();
+            modelBuilder.Entity<UserProfile>();
 
             base.OnModelCreating(modelBuilder);
         }
