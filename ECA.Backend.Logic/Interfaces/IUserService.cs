@@ -12,5 +12,6 @@ namespace ECA.Backend.Logic.Interfaces
     {
         public Task<UserAccount> CreateUser(UserAccount userAccount);
         public Task<LoginResponse> Login(LoginRequest req);
+        public Task<UserAccount> GetUserById(string id);
     }
 }

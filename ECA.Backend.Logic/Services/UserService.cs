@@ -26,11 +26,12 @@ namespace ECA.Backend.Logic.Services
             _log = loggerFactory.CreateLogger<UserService>();
         }
 
-        public async Task<UserAccount> CreateUser(UserAccount userAccount)
+        public async Task<UserAccount?> CreateUser(UserAccount userAccount)
         {
             _log.LogInformation($"Create new userAccount: {userAccount.Username}");
-            
 
+            if ((await GetUserByName(userAccount.Username)) != null)
+                return null;
 
             userAccount.Password = _passwordService.Hash(userAccount.Password);
             userAccount.Email ??= string.Empty;
